@@ -44,9 +44,10 @@ const FileUploadApp = () => {
           <Route path="/upload" element={<Upload />} />
         </Routes>
 
-        <h2 className="mt-10 text-center text-[25px] font-semibold">
+        <h2 className="mt-10 text-center text-[25px] font-bold">
           Uploaded Files
         </h2>
+        <h3 className="text-center text-[20px] mt-5">Click below to download</h3>
         <FileList files={files} />
       </div>
     </BrowserRouter>

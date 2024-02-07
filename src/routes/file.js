@@ -9,8 +9,8 @@ const { protect } = require('../middleware/authMiddleware');
 const storage = multer.diskStorage({
   destination: 'src/uploads/',
   filename: (req, file, cb) => {
-    const uniqueCode = crypto.randomBytes(3).toString('hex').toUpperCase();
-    const filename = `${uniqueCode}_${file.originalname}`;
+
+    const filename = `${file.originalname}`;
     cb(null, filename);
   },
 });
@@ -21,7 +21,7 @@ router.post('/upload', protect, upload.single('file'), async (req, res) => {
   try {
     const userId = req.user._id; // Assuming userId is stored in the user model
     const { filename } = req.file;
-    const uniqueCode = filename.split('_')[0];
+    const uniqueCode = crypto.randomBytes(3).toString('hex').toUpperCase();
     const link = `${process.env.APP_BASE_URL}/file/download/${uniqueCode}`; // Modify this based on your download route
 
     const file = new File({ filename, uniqueCode, userId, link });
@@ -43,7 +43,7 @@ router.get('/list', protect, async (req, res) => {
   try {
     // Assuming you have userId stored in req.user from the protect middleware
     const userId = req.user._id;
-    
+
     const files = await File.find({ userId });
     res.json(files);
   } catch (error) {
@@ -63,11 +63,10 @@ router.post('/delete', async (req, res) => {
 });
 
 
-router.get('/download/:uniqueCode',protect, async (req, res) => {
+router.get('/download/:uniqueCode', async (req, res) => {
   try {
-    const { uniqueCode } = req.params;
-    const file = await File.findOne({ uniqueCode });
-
+    const uniqueCode = req.params.uniqueCode;
+    const file = await File.findOne( {uniqueCode:uniqueCode} );
     if (!file) {
       return res.status(404).send('File not found');
     }
